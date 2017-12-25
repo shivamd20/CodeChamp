@@ -1,7 +1,7 @@
 - alias: hasura
   config:
     configmap: controller-conf
-    namespace: hasura
+    namespace: circadian84-hasura
   data: null
-  kubeContext: jadedly34
-  name: jadedly34
+  kubeContext: circadian84
+  name: circadian84
