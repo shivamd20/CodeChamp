@@ -36,7 +36,7 @@ public class Main {
 		
 		port(getPort());
 
-		Spark.staticFileLocation("static");
+		Spark.staticFileLocation("/public");
 
 		post("/crjava", new Route() {
 
