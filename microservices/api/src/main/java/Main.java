@@ -34,9 +34,24 @@ public class Main {
 		}
 
 		
-		port(getPort());
+		int n=getPort();
+		
+	//	int n=5678;
+		
+		System.out.println(n);
+		
+		port(n);
 
-		Spark.staticFileLocation("/battle-ground-fab/build");
+		Spark.staticFileLocation("/ui/build");
+		
+//		Spark.get("/",new Route() {
+//			
+//			@Override
+//			public Object handle(Request request, Response response) throws Exception {
+//				// TODO Auto-generated method stub
+//				return "hello world";
+//			}
+//		});
 
 		post("/crjava", new Route() {
 
