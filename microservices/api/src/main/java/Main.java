@@ -36,7 +36,7 @@ public class Main {
 		
 		port(getPort());
 
-		Spark.staticFileLocation("/public");
+		Spark.staticFileLocation("/battle-ground-fab/build");
 
 		post("/crjava", new Route() {
 
