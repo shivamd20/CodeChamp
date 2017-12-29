@@ -1,0 +1,9 @@
+
+.middleElement{
+    
+    display: inline-flex;
+    overflow: auto;
+    padding: 1px;
+    margin: 1px;
+    border: 2px  dotted yellow;
+}
