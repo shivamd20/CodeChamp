@@ -1,0 +1,4 @@
+- args:
+    relationship: problem_testcases
+    table: testcase
+  type: drop_relationship

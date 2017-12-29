@@ -1,0 +1,6 @@
+- args:
+    name: userB_game
+    table: game
+    using:
+      foreign_key_constraint_on: userB
+  type: create_object_relationship

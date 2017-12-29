@@ -1,0 +1,8 @@
+- args:
+    sql: CREATE TABLE "game"("game_id" serial NOT NULL, "userA" integer NOT NULL,
+      "userB" integer NOT NULL, "result" text NOT NULL, "problem" integer NOT NULL,
+      "timestamp" timestamptz NOT NULL DEFAULT now(), PRIMARY KEY ("game_id") )
+  type: run_sql
+- args:
+    name: game
+  type: add_existing_table_or_view

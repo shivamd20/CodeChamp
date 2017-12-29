@@ -1,0 +1,4 @@
+- args:
+    sql: ALTER TABLE "problem" ADD FOREIGN KEY ("testcase") REFERENCES "testcase"
+      ("id")
+  type: run_sql
