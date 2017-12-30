@@ -172,3 +172,14 @@ api:
     upstreamServicePort: 80
 
 
+
+real:
+  /:
+    corsPolicy: allow_all
+    upstreamService:
+      name: real
+      namespace: '{{ cluster.metadata.namespaces.user }}'
+    upstreamServicePath: /
+    upstreamServicePort: 80
+
+
