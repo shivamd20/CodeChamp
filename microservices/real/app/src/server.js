@@ -4,6 +4,17 @@ var fs = require('fs');
 var path = require('path');
 var LivePg = require('pg-live-select');
 
+
+var dbcred;
+
+dbcred={
+  username:process.env.POSTGRES_USER,
+  password:process.env.POSTGRES_PASSWORD,
+  hostname:process.env.POSTGRES_HOSTNAME,
+  port:process.env.POSTGRES_PORT
+}
+
+console.log(JSON.stringify(dbcred));
 //your routes here
 app.get('/', function (req, res) {
     res.send("Hello World!");
