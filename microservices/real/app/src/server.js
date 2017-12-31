@@ -15,7 +15,9 @@ app.listen(8080, function () {
 
 
 // Update this line with your username/password/host/database
-var CONN_STR = 'postgres://shivam:shivamd20@127.0.0.1/postgres';
+var CONN_STR = 'postgres://'+process.env.POSTGRES_USER+':'
++process.env.POSTGRES_PASSWORD
++'@'+process.env.POSTGRES_HOSTNAME+'/hasuradb';
 // Load the SELECT query from an external file
 var QUERY = "select * from ramu";
 
