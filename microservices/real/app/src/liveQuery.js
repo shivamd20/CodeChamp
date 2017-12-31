@@ -36,7 +36,6 @@ class LiveQuery{
               username:process.env.POSTGRES_USERNAME,
               password:process.env.POSTGRES_PASSWORD,
               hostname:process.env.POSTGRES_HOSTNAME,
-              port:undefined,
               dbname:'hasuradb'
             }
             }
