@@ -48,6 +48,8 @@ class LiveQuery{
                 dbname:'hasuradb'
               }
             }
+
+            console.log(this.getConnectionString());
             this.liveDb=new LivePg(this.getConnectionString(), value||"ramu");
 
             process.on('SIGINT', function() {
