@@ -7,6 +7,7 @@ var LivePg = require('pg-live-select');
 
 var dbcred;
 
+if(!process.argv){
 dbcred={
   username:process.env.POSTGRES_USERNAME,
   password:process.env.POSTGRES_PASSWORD,
@@ -14,6 +15,18 @@ dbcred={
   port:process.env.POSTGRES_PORT,
   dbname:'hasuradb'
 }
+}
+else{
+  dbcred={
+    username:process.env.POSTGRES_USERNAME,
+    password:process.env.POSTGRES_PASSWORD,
+    hostname:process.env.POSTGRES_HOSTNAME,
+    port:process.env.POSTGRES_PORT,
+    dbname:'hasuradb'
+  }
+}
+
+
 
 console.log(JSON.stringify(dbcred));
 //your routes here
@@ -29,7 +42,7 @@ app.listen(8080, function () {
 // Update this line with your username/password/host/database
 var CONN_STR = 'postgres://'+dbcred.username+':'
 +dbcred.password
-+'@'+dbcred.hostname+'/'+dbcred.dbname;
++'@'+dbcred.hostname+':'+dbcred.port+'/'+dbcred.dbname;
 // Load the SELECT query from an external file
 var QUERY = "select * from ramu";
 
