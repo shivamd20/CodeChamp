@@ -30,24 +30,15 @@ class LiveQuery{
             +'@'+this.dbcred.hostname+'/'+this.dbcred.dbname;
     }
 
-    constructor(value){
-         if(!process.argv){
+    constructor(env,value){
+       
             this.dbcred={
-              username:process.env.POSTGRES_USERNAME,
-              password:process.env.POSTGRES_PASSWORD,
-              hostname:process.env.POSTGRES_HOSTNAME,
-              dbname:'hasuradb'
+              username:env.POSTGRES_USERNAME || env[2],
+              password:env.POSTGRES_PASSWORD || env [3],
+              hostname:env.POSTGRES_HOSTNAME || env [4],
+              dbname:env[5] || 'hasuradb'
             }
-            }
-            else{
-              this.dbcred={
-                username:process.argv.uname,
-                password:process.argv.pwd,
-                hostname:process.argv.hname,
-                port:process.argv.port,
-                dbname:'hasuradb'
-              }
-            }
+          
 
             console.log(this.getConnectionString());
             this.liveDb=new LivePg(this.getConnectionString(), value||"ramu");
@@ -57,9 +48,9 @@ class LiveQuery{
               });
     }
 
-    select(query,handler){
+    select(query,handler,errorhandler){
         try{
-        this.liveDb.select(query).on('update',handler);
+        this.liveDb.select(query).on('update',handler).on('error',errorhandler);
         }catch(e){
             return e;
         }

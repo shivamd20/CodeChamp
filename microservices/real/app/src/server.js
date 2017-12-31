@@ -12,13 +12,12 @@ app.listen(8080, function () {
 });
 
 
-liveQuery=new LiveQuery("first");
 
 
-try{
+liveQuery=new LiveQuery(process.argv || process.env,"first");
+
+
+
 liveQuery.select('select * from user',function(diff,data){
     console.log(JSON.stringify(diff)+"  data: "+JSON.stringify(data));
-});
-}catch(e){
-  console.log(JSON.stringify(e));
-}
+},(e)=>{console.log('error: '+e.toString())});
