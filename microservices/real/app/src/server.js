@@ -8,7 +8,7 @@ var LivePg = require('pg-live-select');
 var dbcred;
 
 dbcred={
-  username:process.env.POSTGRES_USER,
+  username:process.env.POSTGRES_USERNAME,
   password:process.env.POSTGRES_PASSWORD,
   hostname:process.env.POSTGRES_HOSTNAME,
   port:process.env.POSTGRES_PORT
