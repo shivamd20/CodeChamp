@@ -33,9 +33,9 @@ class LiveQuery{
     constructor(env,value){
        
             this.dbcred={
-              username:env.POSTGRES_USERNAME || env[2],
-              password:env.POSTGRES_PASSWORD || env [3],
-              hostname:env.POSTGRES_HOSTNAME || env [4],
+              username:process.env.POSTGRES_USERNAME || env[2],
+              password:process.env.POSTGRES_PASSWORD || env [3],
+              hostname:process.env.POSTGRES_HOSTNAME || env [4],
               dbname:env[5] || 'hasuradb'
             }
           
