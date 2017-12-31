@@ -27,7 +27,7 @@ class LiveQuery{
     getConnectionString(){
             return 'postgres://'+this.dbcred.username+':'
             +this.dbcred.password
-            +'@'+this.dbcred.hostname+':'+this.dbcred.port+'/'+this.dbcred.dbname;
+            +'@'+this.dbcred.hostname+'/'+this.dbcred.dbname;
     }
 
     constructor(value){
