@@ -11,7 +11,8 @@ dbcred={
   username:process.env.POSTGRES_USERNAME,
   password:process.env.POSTGRES_PASSWORD,
   hostname:process.env.POSTGRES_HOSTNAME,
-  port:process.env.POSTGRES_PORT
+  port:process.env.POSTGRES_PORT,
+  dbname:'hasuradb'
 }
 
 console.log(JSON.stringify(dbcred));
@@ -26,9 +27,9 @@ app.listen(8080, function () {
 
 
 // Update this line with your username/password/host/database
-var CONN_STR = 'postgres://'+process.env.POSTGRES_USER+':'
-+process.env.POSTGRES_PASSWORD
-+'@'+process.env.POSTGRES_HOSTNAME+'/hasuradb';
+var CONN_STR = 'postgres://'+dbcred.username+':'
++dbcred.password
++'@'+dbcred.hostname+'/'+dbcred.dbname;
 // Load the SELECT query from an external file
 var QUERY = "select * from ramu";
 
