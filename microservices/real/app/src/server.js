@@ -18,6 +18,6 @@ liveQuery=new LiveQuery(process.argv || process.env,"first");
 
 
 
-liveQuery.select('select * from user',function(diff,data){
+liveQuery.select('select * from user',(diff,data)=>{
     console.log(JSON.stringify(diff)+"  data: "+JSON.stringify(data));
 },(e)=>{console.log('error: '+e.toString())});

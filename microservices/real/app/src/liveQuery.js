@@ -27,7 +27,7 @@ class LiveQuery{
     getConnectionString(){
             return 'postgres://'+this.dbcred.username+':'
             +this.dbcred.password
-            +'@'+this.dbcred.hostname+'/'+this.dbcred.dbname;
+            +'@'+this.dbcred.hostname+':'+this.dbcred.port+'/'+this.dbcred.dbname;
     }
 
     constructor(env,value){
@@ -36,7 +36,8 @@ class LiveQuery{
               username:process.env.POSTGRES_USERNAME || env[2],
               password:process.env.POSTGRES_PASSWORD || env [3],
               hostname:process.env.POSTGRES_HOSTNAME || env [4],
-              dbname:env[5] || 'hasuradb'
+              port: process.env.POSTGRES_PORT || env [5] || 5432,
+              dbname:env[6] || 'hasuradb'
             }
           
 
