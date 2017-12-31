@@ -50,11 +50,16 @@ var QUERY = "select * from ramu";
 var liveDb = new LivePg(CONN_STR, 'mytest');
 
 // Create a live select instance
+
+try{
 liveDb.select(QUERY)
   .on('update', function(diff, data) {
     // Handle the changes here...
     console.log(diff, data);
   });
+}catch(e){
+console.log(JSON.stringify(e));
+}
 
 // On Ctrl+C, remove triggers and exit
 process.on('SIGINT', function() {
