@@ -50,11 +50,7 @@ class LiveQuery{
     }
 
     select(query,handler,errorhandler){
-        try{
-        this.liveDb.select(query).on('update',handler).on('error',errorhandler);
-        }catch(e){
-            return e;
-        }
+        this.liveDb.select(query).on('update',handler).on('error',errorhandler);  
     }
 
     close(){

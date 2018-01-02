@@ -9,6 +9,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.14.0",
-    "pg-live-select": "^1.0.3"
+    "pg-live-select": "^1.0.3",
+    "socket-io": "^1.0.0"
   }
 }

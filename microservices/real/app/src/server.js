@@ -1,6 +1,7 @@
 var express = require('express');
 var LiveQuery=require('./liveQuery');
 var app = express();
+var handleSocket=require('./handleSockets');
 
 //your routes here
 app.get('/', function (req, res) {
@@ -14,9 +15,9 @@ app.listen(8080, function () {
 
 
 
-liveQuery=new LiveQuery(process.argv || process.env,"first");
 
 
+liveQuery=new LiveQuery(process.argv,"first");
 
 liveQuery.select('select * from user',(diff,data)=>{
     console.log(JSON.stringify(diff)+"  data: "+JSON.stringify(data));
