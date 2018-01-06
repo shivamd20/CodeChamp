@@ -1,24 +1,31 @@
 var express = require('express');
-var LiveQuery=require('./liveQuery');
+var HandleSocket=require('./handleSockets');
 var app = express();
 var handleSocket=require('./handleSockets');
+var path = require('path');
+
+var server = require('http').Server(app);
 
 //your routes here
 app.get('/', function (req, res) {
     res.send("Hello World!");
 });
 
-app.listen(8080, function () {
-  console.log('Example app listening on port 8080!');
-});
+// app.get('/client', function(req, res) {
+//     res.sendFile(path.join(__dirname + '/client.html'));
+// });
+
+// app.get('/clientsocket',function(req,res){
+//     res.sendFile(path.join(__dirname + '/node_modules/socket.io-client/dist/socket.io.js'));
+// });
+
+app.use(express.static('client'))
+
+var handleSocket=new HandleSocket(server);
 
 
 
 
-
-
-liveQuery=new LiveQuery(process.argv,"first");
-
-liveQuery.select('select * from user',(diff,data)=>{
-    console.log(JSON.stringify(diff)+"  data: "+JSON.stringify(data));
-},(e)=>{console.log('error: '+e.toString())});
+server.listen(8080, function () {
+    console.log('Example app listening on port 8080!');
+  });

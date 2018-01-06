@@ -27,7 +27,7 @@ class LiveQuery{
     getConnectionString(){
             return 'postgres://'+this.dbcred.username+':'
             +this.dbcred.password
-            +'@'+this.dbcred.hostname+':'+this.dbcred.port+'/'+this.dbcred.dbname;
+            +'@'+this.dbcred.hostname+':'+this.dbcred.port+'/'+this.dbcred.dbname+'?searchpath=public';
     }
 
     constructor(env,value){
@@ -41,16 +41,16 @@ class LiveQuery{
             }
           
 
-            console.log(this.getConnectionString());
+      ////      console.log(this.getConnectionString());
             this.liveDb=new LivePg(this.getConnectionString(), value||"ramu");
 
-            process.on('SIGINT', function() {
+            process.on('SIGINT', ()=> {
                 this.liveDb.cleanup(process.exit);
               });
     }
 
     select(query,handler,errorhandler){
-        this.liveDb.select(query).on('update',handler).on('error',errorhandler);  
+      return  this.liveDb.select(query).on('update',handler).on('error',errorhandler);  
     }
 
     close(){

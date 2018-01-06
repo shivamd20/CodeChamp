@@ -1,0 +1,68 @@
+{
+  "_from": "hasura-js-sdk",
+  "_id": "hasura-js-sdk@0.1.0",
+  "_inBundle": false,
+  "_integrity": "sha512-IFAMr7SNxHNZAcCJWrP2DEz6V8eiRd7tIc+GMjEFMidKYcCX/TFSZYCWuVLY4ORsTonaMMAbZNaM5QIR0uZatg==",
+  "_location": "/hasura-js-sdk",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "hasura-js-sdk",
+    "name": "hasura-js-sdk",
+    "escapedName": "hasura-js-sdk",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/hasura-js-sdk/-/hasura-js-sdk-0.1.0.tgz",
+  "_shasum": "babed317e4a274512cbaa81860d8555289e28810",
+  "_spec": "hasura-js-sdk",
+  "_where": "/home/shivam/hasura/hello-java-spark/microservices/real/app/src",
+  "author": {
+    "name": "Tanmai Gopal"
+  },
+  "bugs": {
+    "url": "https://github.com/hasura/js-sdk/issues"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "whatwg-fetch": "^2.0.3"
+  },
+  "deprecated": false,
+  "description": "Hasura SDK for Javascript in the browser",
+  "devDependencies": {
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-preset-es2015": "^6.24.1",
+    "eslint": "^4.0.0",
+    "rollup": "^0.43.0",
+    "rollup-plugin-babel": "^2.7.1",
+    "rollup-plugin-eslint": "^3.0.0",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-replace": "^1.1.1",
+    "rollup-plugin-uglify": "^2.0.1"
+  },
+  "homepage": "https://github.com/hasura/js-sdk#readme",
+  "keywords": [
+    "hasura",
+    "sdk",
+    "js",
+    "javascript"
+  ],
+  "license": "MIT",
+  "main": "index.js",
+  "name": "hasura-js-sdk",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hasura/js-sdk.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "0.1.0"
+}
