@@ -7,7 +7,9 @@ function queryData(query, token) {
    // var url = "https://data.circadian84.hasura-app.io/v1/query";
 
 
-    var url = "http://data.hasura/v1/query";
+  
+
+    var url = "http://"+ process.env.DATA_HOSTNAME;+"/v1/query";
 
 
     var requestOptions = {

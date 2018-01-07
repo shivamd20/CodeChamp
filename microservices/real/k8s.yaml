@@ -23,6 +23,8 @@ items:
           env:
           - name: POSTGRES_HOSTNAME
             value: postgres.{{ cluster.metadata.namespaces.hasura }}
+          - name: DATA_HOSTNAME
+            value: data.{{ cluster.metadata.namespaces.hasura }}
           - name: POSTGRES_PORT
             value: "5432"
           - name: POSTGRES_USERNAME
