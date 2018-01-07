@@ -68,13 +68,18 @@ class HandleSocket {
                     )
                     .catch((err) => {
                     //    fn(err.toString());
+
+                    if(err.then)
                         err.then((json)=>{
                             fn({error:json});
                         }).catch(e=>{
                             fn({error:e.toString()});
                         });
-                    });
 
+                    else fn(err.toString());
+                        
+                    });
+                
             
             });
 
@@ -103,22 +108,21 @@ var body = {
 
 function convertToString(jsonQuery){
 
-    var obj=jsonQuery.type+" ";
+    var obj={}
 
-  jsonQuery.args.columns.forEach(function(element) {
     
-    {
-        sql=sql+" '"+x+"' ";
-    }
+   obj.type= jsonQuery.type;
 
-  }, this);
-   
+   obj.table= jsonQuery.args.table;
 
-    sql=sql+" from '" +jsonQuery.args.table +"' ";
+   obj.where = jsonQuery.args.where;
 
+   obj.columns = jsonQuery.args.columns;
 
+   var sql=builder.sql(obj);
 
-    console.log(sql);
+console.log(sql);
+
 
     return sql;
 }
