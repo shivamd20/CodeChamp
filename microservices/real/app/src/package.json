@@ -11,6 +11,7 @@
     "express": "^4.14.0",
     "fetch": "^1.1.0",
     "hasura-js-sdk": "^0.1.0",
+    "mongo-sql": "^5.0.0",
     "node-fetch": "^1.7.3",
     "pg-live-select": "^1.0.3",
     "request": "^2.83.0",

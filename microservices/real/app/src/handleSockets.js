@@ -1,6 +1,7 @@
 var socketIo = require('socket.io');
 var LiveQuery = require('./liveQuery');
 var fetchAction = require('node-fetch');
+var builder = require('mongo-sql');
 
 function checkPermission(query, token) {
     var url = "https://data.circadian84.hasura-app.io/v1/query";
@@ -8,6 +9,8 @@ function checkPermission(query, token) {
         "method": "POST",
         "headers": {
             "Content-Type": "application/json",
+            "X-Hasura-User-Id":0,
+            "X-Hasura-Role":'user'
           //  "Authorization": token,
         }
     };
@@ -44,14 +47,7 @@ class HandleSocket {
             socket.on('subscribe', (data,fn) => {
 
                 var key=data.key,
-                sql=data.sql;
-
-                var queryObject = {
-                    "type": "run_sql",
-                    "args": {
-                        "sql": sql
-                    }
-                };
+                queryObject=data.queryObject;
 
                 // console.log(socket.handshake.headers);
                 
@@ -61,7 +57,7 @@ class HandleSocket {
 
                         console.log('permission granted' + JSON.stringify(result));
 
-                        socket.selectMap.set(key, this.liveQuery.select(sql, (diff, data) => {
+                        socket.selectMap.set(key, this.liveQuery.select(convertToString(queryObject), (diff, data) => {
 
                             socket.emit('query' + key, data);
 
@@ -104,8 +100,28 @@ var body = {
     }
 };
 
-// var token = 'eb7573948a47eca327237ebf80f8749ea9sed6590569f2bbf';
 
-// checkPermission(body, token);
+function convertToString(jsonQuery){
+
+    var obj=jsonQuery.type+" ";
+
+  jsonQuery.args.columns.forEach(function(element) {
+    
+    {
+        sql=sql+" '"+x+"' ";
+    }
+
+  }, this);
+   
+
+    sql=sql+" from '" +jsonQuery.args.table +"' ";
+
+
+
+    console.log(sql);
+
+    return sql;
+}
+
 
 module.exports = HandleSocket;
