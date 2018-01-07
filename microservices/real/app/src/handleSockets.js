@@ -3,15 +3,13 @@ var LiveQuery = require('./liveQuery');
 var fetchAction = require('node-fetch');
 var builder = require('mongo-sql');
 
-function checkPermission(query, token) {
+function queryData(query, token) {
     var url = "https://data.circadian84.hasura-app.io/v1/query";
     var requestOptions = {
         "method": "POST",
         "headers": {
             "Content-Type": "application/json",
-            "X-Hasura-User-Id":0,
-            "X-Hasura-Role":'user'
-          //  "Authorization": token,
+            "Authorization": token,
         }
     };
     var body = query;
@@ -39,19 +37,60 @@ class HandleSocket {
     constructor(server) {
 
         this.io = socketIo(server);
+
+        //this.io.set('origins', '*');
+
         this.liveQuery = new LiveQuery(process.argv, "first");
         this.onConnection = (socket) => {
 
             socket.selectMap = new Map();
 
+            socket.on('querydata',(query,fn)=>{
+
+                queryData(query,socket.handshake.Authorization)
+                .then(data=>{
+                    fn({
+                        "status":'ok',
+                        'data':data
+                });
+                })
+                .catch((err) => {
+                    //    fn(err.toString());
+
+                    if(err.then)
+                        err.then((json)=>{
+                            fn(
+                                {'status':'error',
+                                'error':json
+                            });
+                        }).catch(e=>{
+                            fn(
+                                {'status':'error',
+                                'error':e.toString()
+                            });
+                        });
+
+                    else fn(
+                        {'status':'error',
+                        'error':err.toString()
+                    }
+                    );
+                        
+                    });
+
+            });
+
             socket.on('subscribe', (data,fn) => {
 
                 var key=data.key,
-                queryObject=data.queryObject;
+                queryObject=data.queryObject,
+                diff=data.diff,
+                data=data.data;
 
-                // console.log(socket.handshake.headers);
+
+                console.log('key:  '+key);
                 
-                checkPermission(queryObject, socket.handshake.headers['Authorization'])
+                queryData(queryObject, socket.handshake.headers['Authorization'])
 
                     .then((result) => {
 
@@ -59,11 +98,13 @@ class HandleSocket {
 
                         socket.selectMap.set(key, this.liveQuery.select(convertToString(queryObject), (diff, data) => {
 
-                            socket.emit('query' + key, data);
+                            socket.emit('datachange'+key, data);
 
-                            console.log(JSON.stringify(diff) + "  data: " + JSON.stringify(data));
+                            console.log("key: "+key+"  diff:  "+JSON.stringify(diff) + "  data: " + JSON.stringify(data));
                         }
-                            , (e) => { fn({error:e.toString()}) }))
+                            , (e) => { fn({error:e.toString(),
+                                
+                                    cause:'2'}) })) 
                     }
                     )
                     .catch((err) => {
@@ -71,9 +112,15 @@ class HandleSocket {
 
                     if(err.then)
                         err.then((json)=>{
-                            fn({error:json});
+                            fn({error:json,
+                                
+                                    cause:'3'});
                         }).catch(e=>{
-                            fn({error:e.toString()});
+                            fn({error:e.toString(),
+                            
+                                cause:'1'
+
+                            });
                         });
 
                     else fn(err.toString());
@@ -98,33 +145,22 @@ class HandleSocket {
 
 }
 
-var body = {
-    "type": "run-sql",
-    "args": {
-        "sql": "select * from user"
-    }
-};
 
 
 function convertToString(jsonQuery){
 
     var obj={}
-
-    
+    if(jsonQuery.type==='select')
+    {
    obj.type= jsonQuery.type;
-
    obj.table= jsonQuery.args.table;
-
    obj.where = jsonQuery.args.where;
-
    obj.columns = jsonQuery.args.columns;
-
    var sql=builder.sql(obj);
-
-console.log(sql);
-
-
-    return sql;
+    }
+   console.log("sql: ");
+    console.log(sql.query);
+    return sql.query;
 }
 
 
