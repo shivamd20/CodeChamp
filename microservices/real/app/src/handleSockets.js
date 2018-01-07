@@ -9,7 +9,7 @@ function queryData(query, token) {
 
   
 
-    var url = "http://"+ process.env.DATA_HOSTNAME;+"/v1/query";
+    var url = "http://"+ process.env.DATA_HOSTNAME+"/v1/query";
 
 
     var requestOptions = {
