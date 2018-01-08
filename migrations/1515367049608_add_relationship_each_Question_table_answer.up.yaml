@@ -1,0 +1,6 @@
+- args:
+    name: each_Question
+    table: answer
+    using:
+      foreign_key_constraint_on: question
+  type: create_object_relationship

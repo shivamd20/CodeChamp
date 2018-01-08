@@ -4,12 +4,12 @@ var fetchAction = require('node-fetch');
 var builder = require('mongo-sql');
 
 function queryData(query, token) {
-   // var url = "https://data.circadian84.hasura-app.io/v1/query";
+    // var url = "https://data.circadian84.hasura-app.io/v1/query";
 
 
-  
 
-    var url = "http://"+ process.env.DATA_HOSTNAME+"/v1/query";
+
+    var url = "http://" + process.env.DATA_HOSTNAME + "/v1/query";
 
 
     var requestOptions = {
@@ -24,9 +24,9 @@ function queryData(query, token) {
     return fetchAction(url, requestOptions)
         .then(function (res) {
 
-            if(res.ok)
-            return res.json();
-            else{
+            if (res.ok)
+                return res.json();
+            else {
                 throw res.json();
             }
         })
@@ -52,51 +52,53 @@ class HandleSocket {
 
             socket.selectMap = new Map();
 
-            socket.on('querydata',(query,fn)=>{
+            socket.on('querydata', (query, fn) => {
 
-                queryData(query,socket.handshake.Authorization)
-                .then(data=>{
-                    fn({
-                        "status":'ok',
-                        'data':data
-                });
-                })
-                .catch((err) => {
-                    //    fn(err.toString());
-
-                    if(err.then)
-                        err.then((json)=>{
-                            fn(
-                                {'status':'error',
-                                'error':json
-                            });
-                        }).catch(e=>{
-                            fn(
-                                {'status':'error',
-                                'error':e.toString()
-                            });
+                queryData(query, socket.handshake.Authorization)
+                    .then(data => {
+                        fn({
+                            "status": 'ok',
+                            'data': data
                         });
+                    })
+                    .catch((err) => {
+                        //    fn(err.toString());
 
-                    else fn(
-                        {'status':'error',
-                        'error':err.toString()
-                    }
-                    );
-                        
+                        if (err.then)
+                            err.then((json) => {
+                                fn(
+                                    {
+                                        'status': 'error',
+                                        'error': json
+                                    });
+                            }).catch(e => {
+                                fn(
+                                    {
+                                        'status': 'error',
+                                        'error': e.toString()
+                                    });
+                            });
+
+                        else fn(
+                            {
+                                'status': 'error',
+                                'error': err.toString()
+                            }
+                        );
+
                     });
 
             });
 
-            socket.on('subscribe', (data,fn) => {
+            socket.on('subscribe', (data,key,what, fn) => {
 
-                var key=data.key,
-                queryObject=data.queryObject,
-                diff=data.diff,
-                data=data.data;
+               
+                  var  diff = what.diff,
+                    data = what.data;
 
 
-                console.log('key:  '+key);
-                
+                console.log('key:  ' + key);
+
                 queryData(queryObject, socket.handshake.headers['Authorization'])
 
                     .then((result) => {
@@ -105,39 +107,65 @@ class HandleSocket {
 
                         socket.selectMap.set(key, this.liveQuery.select(convertToString(queryObject), (diff, data) => {
 
-                            socket.emit('datachange'+key, data);
+                            socket.emit('datachange', key, data);
 
-                            console.log("key: "+key+"  diff:  "+JSON.stringify(diff) + "  data: " + JSON.stringify(data));
+                            console.log("key: " + key + "  diff:  " + JSON.stringify(diff) + "  data: " + JSON.stringify(data));
                         }
-                            , (e) => { fn({error:e.toString(),
-                                
-                                    cause:'2'}) })) 
+                            , (e) => {
+                                fn({
+                                    error: e.toString(),
+
+                                    cause: '2'
+                                })
+                            }))
                     }
                     )
                     .catch((err) => {
-                    //    fn(err.toString());
+                        //    fn(err.toString());
 
-                    if(err.then)
-                        err.then((json)=>{
-                            fn({error:json,
-                                
-                                    cause:'3'});
-                        }).catch(e=>{
-                            fn({error:e.toString(),
-                            
-                                cause:'1'
+                        if (err.then)
+                            err.then((json) => {
+                                fn({
+                                    error: json,
 
+                                    cause: '3'
+                                });
+                            }).catch(e => {
+                                fn({
+                                    error: e.toString(),
+
+                                    cause: '1'
+
+                                });
                             });
-                        });
 
-                    else fn(err.toString());
-                        
+                        else fn(err.toString());
+
                     });
-                
-            
+
+
             });
 
 
+            socket.on('unsubscribe', ( key, fn) => {
+                
+                var liveQuery=socket.selectMap.get(key);
+
+                if(liveQuery){
+                        liveQuery.stop();
+                        liveQuery=null;
+
+                        fn(key, {
+                            status:'unsubscribed'
+                        });
+                }
+
+                fn(key, {
+                    status:'key not subscribed'
+                });
+
+               
+            });
         }
 
         this.io.on('connection', this.onConnection);
@@ -154,18 +182,17 @@ class HandleSocket {
 
 
 
-function convertToString(jsonQuery){
+function convertToString(jsonQuery) {
 
-    var obj={}
-    if(jsonQuery.type==='select')
-    {
-   obj.type= jsonQuery.type;
-   obj.table= jsonQuery.args.table;
-   obj.where = jsonQuery.args.where;
-   obj.columns = jsonQuery.args.columns;
-   var sql=builder.sql(obj);
+    var obj = {}
+    if (jsonQuery.type === 'select') {
+        obj.type = jsonQuery.type;
+        obj.table = jsonQuery.args.table;
+        obj.where = jsonQuery.args.where;
+        obj.columns = jsonQuery.args.columns;
+        var sql = builder.sql(obj);
     }
-   console.log("sql: ");
+    console.log("sql: ");
     console.log(sql.query);
     return sql.query;
 }

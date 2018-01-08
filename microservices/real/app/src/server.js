@@ -30,4 +30,4 @@ server.listen(8080, function () {
     console.log('Example app listening on port 8080!');
   });
 
-  console.log(process.env);
+  //console.log(process.env);

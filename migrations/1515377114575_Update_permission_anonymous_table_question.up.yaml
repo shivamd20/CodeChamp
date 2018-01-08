@@ -1,0 +1,11 @@
+- args:
+    role: anonymous
+    table: question
+  type: drop_update_permission
+- args:
+    permission:
+      columns: []
+      filter: {}
+    role: anonymous
+    table: question
+  type: create_update_permission

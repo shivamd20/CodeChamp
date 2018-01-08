@@ -1,0 +1,7 @@
+- args:
+    sql: CREATE TABLE "answer"("id" serial NOT NULL, "question" integer NOT NULL,
+      "ans" text NOT NULL, PRIMARY KEY ("id") )
+  type: run_sql
+- args:
+    name: answer
+  type: add_existing_table_or_view

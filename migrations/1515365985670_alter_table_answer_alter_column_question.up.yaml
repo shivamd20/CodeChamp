@@ -1,0 +1,9 @@
+- args:
+    sql: ALTER TABLE "answer" ALTER COLUMN "question" TYPE integer;
+  type: run_sql
+- args:
+    sql: ALTER TABLE "answer" ALTER COLUMN "question" DROP DEFAULT;
+  type: run_sql
+- args:
+    sql: ALTER TABLE "answer" ALTER COLUMN "question" SET NOT NULL;
+  type: run_sql

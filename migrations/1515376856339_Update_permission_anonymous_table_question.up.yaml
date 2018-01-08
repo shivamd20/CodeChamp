@@ -1,0 +1,9 @@
+- args:
+    permission:
+      columns:
+      - id
+      - question
+      filter: {}
+    role: anonymous
+    table: question
+  type: create_update_permission

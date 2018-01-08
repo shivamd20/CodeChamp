@@ -1,0 +1,4 @@
+- args:
+    role: anonymous
+    table: question
+  type: drop_update_permission

@@ -1,0 +1,9 @@
+- args:
+    permission:
+      columns:
+      - question
+      - id
+      filter: {}
+    role: anonymous
+    table: question
+  type: create_select_permission

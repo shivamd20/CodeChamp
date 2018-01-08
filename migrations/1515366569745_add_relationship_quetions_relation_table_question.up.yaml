@@ -1,0 +1,8 @@
+- args:
+    name: quetions_relation
+    table: question
+    using:
+      foreign_key_constraint_on:
+        column: question
+        table: answer
+  type: create_array_relationship
