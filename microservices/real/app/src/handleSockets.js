@@ -4,13 +4,11 @@ var fetchAction = require('node-fetch');
 var builder = require('mongo-sql');
 
 function queryData(query, token) {
-    // var url = "https://data.circadian84.hasura-app.io/v1/query";
 
-
-
-
+    if(process.env.DEV)
+     var url = "https://data.circadian84.hasura-app.io/v1/query";
+else
     var url = "http://" + process.env.DATA_HOSTNAME + "/v1/query";
-
 
     var requestOptions = {
         "method": "POST",
@@ -93,21 +91,21 @@ class HandleSocket {
             socket.on('subscribe', (data,key,what, fn) => {
 
                
-                  var  diff = what.diff,
-                    data = what.data;
+                  var  includediff = what.diff?true:false,
+                    includedata = what.data?true:false;
 
 
                 console.log('key:  ' + key);
 
-                queryData(queryObject, socket.handshake.headers['Authorization'])
+                queryData(data, socket.handshake.headers['Authorization'])
 
                     .then((result) => {
 
                         console.log('permission granted' + JSON.stringify(result));
 
-                        socket.selectMap.set(key, this.liveQuery.select(convertToString(queryObject), (diff, data) => {
+                        socket.selectMap.set(key, this.liveQuery.select(convertToString(data), (diff, data) => {
 
-                            socket.emit('datachange', key, data);
+                            socket.emit('datachange'+ key, data);
 
                             console.log("key: " + key + "  diff:  " + JSON.stringify(diff) + "  data: " + JSON.stringify(data));
                         }

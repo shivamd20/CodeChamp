@@ -1,5 +1,4 @@
-
-Hello world
+ Hello world
 
 <script src="/socket.io-client/dist/socket.io.js"></script>
 <script src="/hasura-js-sdk/build/js/main.min.js"></script>
@@ -9,4 +8,37 @@ Hello world
     console.log(data);
     socket.emit('my other event', { my: 'data' });
   });
+
+
+  class RealClient {
+
+    constructor(url) {
+      this.socket = io.connect(url || undefined);
+    }
+
+    querydata(query, fn) {
+
+      this.socket.emit('querydata', query, fn);
+
+    }
+
+    subscribe(query, key, options, onchange, ack) {
+
+      this.socket.on('datachange'+key,onchange);
+
+      this.socket.emit('subscribe', query, key, options, onchange, ack);
+
+    }
+
+    unsubscribe(key, ack) {
+
+      this.socket.removeListener('datachange'+key);
+      
+      this.socket.emit('unsubscribe', key, ack);
+    
+    }
+
+
+  }
+
 </script>
