@@ -1,41 +1,76 @@
+
+
 var socketIo = require('socket.io');
 var LiveQuery = require('./liveQuery');
 var fetchAction = require('node-fetch');
 var builder = require('mongo-sql');
+var request = require('request');
 
-function queryData(query, token) {
+var axios = require('axios');
 
-    if(process.env.DEV)
-     var url = "https://data.circadian84.hasura-app.io/v1/query";
-else
-    var url = "http://" + process.env.DATA_HOSTNAME + "/v1/query";
+const clusterName = 'circadian84';
 
-    var requestOptions = {
-        "method": "POST",
-        "headers": {
-            "Content-Type": "application/json",
-            "Authorization": token,
-        }
-    };
-    var body = query;
-    requestOptions.body = JSON.stringify(body);
-    return fetchAction(url, requestOptions)
-        .then(function (res) {
 
-            if (res.ok)
-                return res.json();
-            else {
-                throw res.json();
-            }
-        })
 
-    // .then(function(result) {
-    //     console.log("success"+JSON.stringify(result));
-    // })
-    // .catch(function(error) {
-    //     console.log('Request Failed:' + error);
-    // });
+async function query(options ){
+
+  return  await axios(options);
+
 }
+
+function queryData(q, token)
+{
+    var options={
+        url:'https://data.'+clusterName+'.hasura-app.io/v1/query',
+        body : q,
+        json : true,
+        method : 'post',
+        headers : {
+            Authorization : token,
+            "Content-Type": "application/json",
+        }
+    }
+
+    query(options).then((data)=>{
+        console.log(data);
+    }).catch(e=>{
+        console.log(e.response.data);
+    });
+}
+
+// function queryData(query, token) {
+
+//     if(process.env.DEV)
+//      var url = "https://data.circadian84.hasura-app.io/v1/query";
+// else
+//     var url = "http://" + process.env.DATA_HOSTNAME + "/v1/query";
+
+//     var requestOptions = {
+//         "method": "POST",
+//         "headers": {
+//             "Content-Type": "application/json",
+//             "Authorization": token,
+//         }
+//     };
+//     var body = query;
+//     requestOptions.body = JSON.stringify(body);
+//     return fetchAction(url, requestOptions)
+//         .then(function (res) {
+
+//             if (res.ok)
+//                 return res.json();
+//             else {
+//                 throw res.json();
+//             }
+//         })
+
+//     // .then(function(result) {
+//     //     console.log("success"+JSON.stringify(result));
+//     // })
+//     // .catch(function(error) {
+//     //     console.log('Request Failed:' + error);
+//     // });
+// }
 
 class HandleSocket {
 
@@ -93,7 +128,6 @@ class HandleSocket {
                
                   var  includediff = what.diff?true:false,
                     includedata = what.data?true:false;
-
 
                 console.log('key:  ' + key);
 
@@ -157,12 +191,12 @@ class HandleSocket {
                             status:'unsubscribed'
                         });
                 }
+                else
 
                 fn(key, {
                     status:'key not subscribed'
                 });
 
-               
             });
         }
 
@@ -197,3 +231,5 @@ function convertToString(jsonQuery) {
 
 
 module.exports = HandleSocket;
+
+queryData({},null);
