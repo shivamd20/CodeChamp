@@ -10,6 +10,11 @@ var axios = require('axios');
 
 var clusterName = process.env.clusterName;
 
+
+
+var liveQuery = new LiveQuery(process.argv, "first");
+
+
 var isFunction = function(obj) {
     return !!(obj && obj.constructor && obj.call && obj.apply);
   };
@@ -47,7 +52,6 @@ class HandleSocket {
 
         //this.io.set('origins', '*');
 
-        this.liveQuery = new LiveQuery(process.argv, "first");
         this.onConnection = (socket) => {
 
             socket.selectMap = new Map();
@@ -61,14 +65,14 @@ class HandleSocket {
 
                         console.log(response);
 
-                        if(fn)
+                       isFunction(fn)
                         fn({
                             "status": 'ok',
                             'data': response.data
                         });
                     })
                     .catch((err) => {
-                              if(fn)
+                             isFunction(fn)
                                 fn(
                                     {
                                         'status': 'error',
@@ -85,7 +89,7 @@ class HandleSocket {
             socket.on("settoken", (data,fn)=>{
 
                 socket.token=data;
-                if(fn)
+               isFunction(fn)
                 fn({
                     status : 'okay',
                     message : 'auth token set'
@@ -109,7 +113,7 @@ class HandleSocket {
  
                         var sql = convertToString(data);
 
-                        socket.selectMap.set(key, this.liveQuery.select(sql.query, sql.values, (diff, data) => {
+                        socket.selectMap.set(key, liveQuery.select(sql.query, sql.values, (diff, data) => {
 
                             socket.emit('datachange'+ key, data);
 
@@ -118,7 +122,7 @@ class HandleSocket {
                             , (e) => {
 
                                // console.log(e);
-                               if(fn)
+                              isFunction(fn)
                                 fn({
                                     error: e.toString(),
 
@@ -138,7 +142,7 @@ class HandleSocket {
                             errstr = err.toString();
                         }
                         
-                        if(fn)
+                       isFunction(fn)
                         fn({
                             error: errstr,
 
@@ -154,20 +158,20 @@ class HandleSocket {
 
             socket.on('unsubscribe', ( key, fn) => {
                 
-                var liveQuery=socket.selectMap.get(key);
+                var lq=socket.selectMap.get(key);
 
-                if(liveQuery){
-                        liveQuery.stop();
-                        liveQuery=null;
+                if(lq){
+                        lq.stop();
+                        lq=null;
 
-                        if(fn)
+                       isFunction(fn)
                         fn(key, {
                             status:'unsubscribed'
                         });
                 }
                 else
 
-                if(fn)
+               isFunction(fn)
                 fn(key, {
                     status:'key not subscribed'
                 });
