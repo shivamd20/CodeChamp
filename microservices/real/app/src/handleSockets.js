@@ -184,7 +184,7 @@ class HandleSocket {
 
 function convertToString(jsonQuery) {
 
-    if( jsonQuery || !jsonQuery.args || !jsonQuery.args.table || !jsonQuery.args.columns ) return;
+    if( !jsonQuery || !jsonQuery.args || !jsonQuery.args.table || !jsonQuery.args.columns ) return;
 
     console.log("json query");
     console.log(jsonQuery);
@@ -198,6 +198,7 @@ function convertToString(jsonQuery) {
 
         }
 
+        if(jsonQuery.args.where)
         obj.where = jsonQuery.args.where;
 
         if(jsonQuery.args.order_by){
@@ -205,7 +206,7 @@ function convertToString(jsonQuery) {
             obj.order =[]
             jsonQuery.args.order_by.forEach(element => {
                 
-                obj.order.push(""+element.column+" "+ element.order );
+                obj.order.push(""+element.column+" "+ (element.order || "") );
 
             });
         }
