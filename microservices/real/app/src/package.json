@@ -1,11 +1,12 @@
 {
-  "name": "quickstart-docker-express-example",
+  "name": "rt-hasura",
   "version": "1.0.0",
   "description": "Demo to show git push build and deploy",
   "scripts": {
     "start": "clusterName='circadian84'  node server.js"
   },
-  "author": "",
+  "main": "handleSockets.js",
+  "author": "shivam kumar dwivedi",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.17.1",
