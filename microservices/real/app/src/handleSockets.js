@@ -1,5 +1,4 @@
 
-var token = "";
 
 var socketIo = require('socket.io');
 var LiveQuery = require('./liveQuery');
@@ -9,7 +8,11 @@ var request = require('request');
 
 var axios = require('axios');
 
-const clusterName = process.env.clusterName;
+var clusterName = process.env.clusterName;
+
+var isFunction = function(obj) {
+    return !!(obj && obj.constructor && obj.call && obj.apply);
+  };
 
 async function query(options ){
 
@@ -36,7 +39,9 @@ function queryData(q, token)
 
 class HandleSocket {
 
-    constructor(server) {
+    constructor(server , cName) {
+
+       if( cName ) clusterName = cName;
 
         this.io = socketIo(server);
 
@@ -155,12 +160,14 @@ class HandleSocket {
                         liveQuery.stop();
                         liveQuery=null;
 
+                        if(fn)
                         fn(key, {
                             status:'unsubscribed'
                         });
                 }
                 else
 
+                if(fn)
                 fn(key, {
                     status:'key not subscribed'
                 });
