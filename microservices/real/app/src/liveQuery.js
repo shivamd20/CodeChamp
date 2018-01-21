@@ -49,8 +49,8 @@ class LiveQuery{
               });
     }
 
-    select(query,handler,errorhandler){
-      return  this.liveDb.select(query).on('update',handler).on('error',errorhandler);  
+    select(query, values, handler,errorhandler){
+      return  this.liveDb.select(query,values).on('update',handler).on('error',errorhandler);  
     }
 
     close(){

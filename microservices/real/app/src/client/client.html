@@ -19,10 +19,12 @@
     querydata(query, fn) {
 
       this.socket.emit('querydata', query, fn);
-
+      
     }
 
     subscribe(query, key, options, onchange, ack) {
+
+     
 
       this.socket.on('datachange'+key,onchange);
 
@@ -38,7 +40,20 @@
     
     }
 
+    auth(query,ack){
+      this.socket.emit('auth', query, fn);
+    }
+
+    ms(url,data,header,ack){
+
+      
+
+    }
+
 
   }
 
 </script>
+
+
+// if((input)=>{input === "ramu"}).input()

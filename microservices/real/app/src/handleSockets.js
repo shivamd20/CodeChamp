@@ -1,4 +1,5 @@
 
+var token = "";
 
 var socketIo = require('socket.io');
 var LiveQuery = require('./liveQuery');
@@ -8,9 +9,7 @@ var request = require('request');
 
 var axios = require('axios');
 
-const clusterName = 'circadian84';
-
-
+const clusterName = process.env.clusterName;
 
 async function query(options ){
 
@@ -22,55 +21,18 @@ function queryData(q, token)
 {
     var options={
         url:'https://data.'+clusterName+'.hasura-app.io/v1/query',
-        body : q,
-        json : true,
+        data : q,
         method : 'post',
+        json : true,
         headers : {
-            Authorization : token,
+           Authorization : token || null,
             "Content-Type": "application/json",
         }
     }
 
-    query(options).then((data)=>{
-        console.log(data);
-    }).catch(e=>{
-        console.log(e.response.data);
-    });
+     return query(options);
 }
 
-// function queryData(query, token) {
-
-//     if(process.env.DEV)
-//      var url = "https://data.circadian84.hasura-app.io/v1/query";
-// else
-//     var url = "http://" + process.env.DATA_HOSTNAME + "/v1/query";
-
-//     var requestOptions = {
-//         "method": "POST",
-//         "headers": {
-//             "Content-Type": "application/json",
-//             "Authorization": token,
-//         }
-//     };
-//     var body = query;
-//     requestOptions.body = JSON.stringify(body);
-//     return fetchAction(url, requestOptions)
-//         .then(function (res) {
-
-//             if (res.ok)
-//                 return res.json();
-//             else {
-//                 throw res.json();
-//             }
-//         })
-
-//     // .then(function(result) {
-//     //     console.log("success"+JSON.stringify(result));
-//     // })
-//     // .catch(function(error) {
-//     //     console.log('Request Failed:' + error);
-//     // });
-// }
 
 class HandleSocket {
 
@@ -85,65 +47,73 @@ class HandleSocket {
 
             socket.selectMap = new Map();
 
+           // socket.token='Bearer d79e6e8a76f6363a6f200969b55e6f550d3c593c60f16214';
+
             socket.on('querydata', (query, fn) => {
 
-                queryData(query, socket.handshake.Authorization)
-                    .then(data => {
+                queryData(query,socket.token)
+                    .then(response => {
+
+                        console.log(response);
+
+                        if(fn)
                         fn({
                             "status": 'ok',
-                            'data': data
+                            'data': response.data
                         });
                     })
                     .catch((err) => {
-                        //    fn(err.toString());
-
-                        if (err.then)
-                            err.then((json) => {
+                              if(fn)
                                 fn(
                                     {
                                         'status': 'error',
-                                        'error': json
+                                        'error': err.response.data
                                     });
-                            }).catch(e => {
-                                fn(
-                                    {
-                                        'status': 'error',
-                                        'error': e.toString()
-                                    });
-                            });
 
-                        else fn(
-                            {
-                                'status': 'error',
-                                'error': err.toString()
-                            }
-                        );
-
+                    console.log(err);
+                        
                     });
+
 
             });
 
-            socket.on('subscribe', (data,key,what, fn) => {
+            socket.on("settoken", (data,fn)=>{
 
-               
-                  var  includediff = what.diff?true:false,
-                    includedata = what.data?true:false;
+                socket.token=data;
+                if(fn)
+                fn({
+                    status : 'okay',
+                    message : 'auth token set'
+                });
+
+            })
+
+            socket.on('subscribe', (data,key, fn) => {
+
+                //   var  includediff = what.diff?true:false,
+                //     includedata = what.data?true:false;
 
                 console.log('key:  ' + key);
 
-                queryData(data, socket.handshake.headers['Authorization'])
+                queryData(data, socket.token)
 
                     .then((result) => {
 
-                        console.log('permission granted' + JSON.stringify(result));
+                        console.log('permission granted')
+                         console.log( JSON.stringify(result.data));
+ 
+                        var sql = convertToString(data);
 
-                        socket.selectMap.set(key, this.liveQuery.select(convertToString(data), (diff, data) => {
+                        socket.selectMap.set(key, this.liveQuery.select(sql.query, sql.values, (diff, data) => {
 
                             socket.emit('datachange'+ key, data);
 
                             console.log("key: " + key + "  diff:  " + JSON.stringify(diff) + "  data: " + JSON.stringify(data));
                         }
                             , (e) => {
+
+                               // console.log(e);
+                               if(fn)
                                 fn({
                                     error: e.toString(),
 
@@ -155,23 +125,21 @@ class HandleSocket {
                     .catch((err) => {
                         //    fn(err.toString());
 
-                        if (err.then)
-                            err.then((json) => {
-                                fn({
-                                    error: json,
+                        var errstr;
 
-                                    cause: '3'
-                                });
-                            }).catch(e => {
-                                fn({
-                                    error: e.toString(),
+                        if(err.response){
+                            errstr= err.response.data
+                        }else{
+                            errstr = err.toString();
+                        }
+                        
+                        if(fn)
+                        fn({
+                            error: errstr,
 
-                                    cause: '1'
+                            cause: '1'
 
-                                });
-                            });
-
-                        else fn(err.toString());
+                        });
 
                     });
 
@@ -216,20 +184,76 @@ class HandleSocket {
 
 function convertToString(jsonQuery) {
 
+    if( jsonQuery || !jsonQuery.args || !jsonQuery.args.table || !jsonQuery.args.columns ) return;
+
+    console.log("json query");
+    console.log(jsonQuery);
     var obj = {}
     if (jsonQuery.type === 'select') {
         obj.type = jsonQuery.type;
         obj.table = jsonQuery.args.table;
+
+
+        var where={
+
+        }
+
         obj.where = jsonQuery.args.where;
+
+        if(jsonQuery.args.order_by){
+
+            obj.order =[]
+            jsonQuery.args.order_by.forEach(element => {
+                
+                obj.order.push(""+element.column+" "+ element.order );
+
+            });
+        }
+
+
         obj.columns = jsonQuery.args.columns;
         var sql = builder.sql(obj);
+
+        if(jsonQuery.args.limit){
+            sql.query= sql.query+" limit "+jsonQuery.args.limit;
+        }
     }
+    else return;
     console.log("sql: ");
-    console.log(sql.query);
-    return sql.query;
+    console.log(sql.values);
+
+
+    return sql;
 }
 
 
 module.exports = HandleSocket;
 
-queryData({},null);
+console.log(convertToString(
+    {
+        "type": "select",
+        "args": {
+            "table": "article",
+            "columns": [
+                "author_id",
+                "content"
+            ],
+            "where": {
+                "$eq": {
+                    '$author_id':'ramu'
+                }
+            }
+        }
+    }
+));
+
+// queryData(JSON.stringify({
+//     "type": "select",
+//     "args": {
+//         "table": "article",
+//         "columns": [
+//             "*"
+//         ]
+//     }
+// })
+// ,'Bearer d79e6e8a76f6363a6f200969b55e6f550d3c593c60f16214');
