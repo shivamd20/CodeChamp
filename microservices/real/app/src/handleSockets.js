@@ -8,8 +8,7 @@ var request = require('request');
 
 var axios = require('axios');
 
-var clusterName = process.env.clusterName;
-
+var clusterName;
 
 
 var liveQuery = new LiveQuery(process.argv, "first");
@@ -44,9 +43,14 @@ function queryData(q, token)
 
 class HandleSocket {
 
-    constructor(server , cName) {
+    constructor(server , config) {
 
-       if( cName ) clusterName = cName;
+        if(!config) config = {};
+
+        clusterName = config.CLUSETER_NAME || process.env.CLUSETER_NAME;
+
+        liveQuery = new LiveQuery(process.argv, config);
+
 
         this.io = socketIo(server);
 
@@ -117,7 +121,7 @@ class HandleSocket {
 
                             socket.emit('datachange'+ key, data);
 
-                            console.log("key: " + key + "  diff:  " + JSON.stringify(diff) + "  data: " + JSON.stringify(data));
+                        //    console.log("key: " + key + "  diff:  " + JSON.stringify(diff) + "  data: " + JSON.stringify(data));
                         }
                             , (e) => {
 
