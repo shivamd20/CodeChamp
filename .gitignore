@@ -1,2 +1,3 @@
 .hasura
 microservices/real/app/src/secrets.txt
+microservices/real/app/src/env.js
