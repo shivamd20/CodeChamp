@@ -30,18 +30,20 @@ class LiveQuery{
             +'@'+this.dbcred.hostname+':'+this.dbcred.port+'/'+this.dbcred.dbname+'?searchpath=public';
     }
 
-    constructor(env,value){
+    constructor(config,value){
+
+
        
             this.dbcred={
-              username:process.env.POSTGRES_USERNAME || env[2],
-              password:process.env.POSTGRES_PASSWORD || env [3],
-              hostname:process.env.POSTGRES_HOSTNAME || env [4],
-              port: process.env.POSTGRES_PORT || env [5] || 5432,
-              dbname:env[6] || 'hasuradb'
+              username:config.POSTGRES_USERNAME || process.env.POSTGRES_USERNAME  ,
+              password:config.POSTGRES_PASSWORD || process.env.POSTGRES_PASSWORD ,
+              hostname:config.POSTGRES_HOSTNAME || process.env.POSTGRES_HOSTNAME || 'localhost',
+              port: config.POSTGRES_PORT || process.env.POSTGRES_PORT || 5432,
+              dbname:config.DB_NAME || process.env.DB_NAME || 'hasuradb'
             }
           
 
-      ////      console.log(this.getConnectionString());
+            console.log(this.getConnectionString());
             this.liveDb=new LivePg(this.getConnectionString(), value||"ramu");
 
             process.on('SIGINT', ()=> {
