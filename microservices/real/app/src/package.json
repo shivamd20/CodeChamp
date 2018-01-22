@@ -1,9 +1,9 @@
 {
   "name": "rt-hasura",
-  "version": "1.0.0",
-  "description": "Demo to show git push build and deploy",
+  "version": "1.0.1",
+  "description": "Access hasura db in real-time",
   "scripts": {
-    "start": "clusterName='circadian84'  node server.js"
+    "start": "node server.js"
   },
   "main": "handleSockets.js",
   "author": "shivam kumar dwivedi",
@@ -11,15 +11,8 @@
   "dependencies": {
     "axios": "^0.17.1",
     "express": "^4.14.0",
-    "fetch": "^1.1.0",
-    "hasura-js-sdk": "^0.1.0",
     "mongo-sql": "^5.0.0",
-    "node-fetch": "^1.7.3",
     "pg-live-select": "^1.0.3",
-    "request": "^2.83.0",
-    "request-promise": "^4.2.2",
-    "socket-io": "^1.0.0",
-    "socket.io": "^2.0.4",
-    "socket.io-client": "^2.0.4"
+    "socket.io": "^2.0.4"
   }
 }
