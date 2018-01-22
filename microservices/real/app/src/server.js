@@ -1,10 +1,18 @@
+
+require('./env')();
+
 var express = require('express');
 var HandleSocket=require('./handleSockets');
 var app = express();
+
+
+
 var handleSocket=require('./handleSockets');
 var path = require('path');
 
 var server = require('http').Server(app);
+
+
 
 //your routes here
 app.get('/', function (req, res) {
