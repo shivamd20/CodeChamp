@@ -1,2 +1,4 @@
 node_modules
 secrets.txt
+server.js
+env.js

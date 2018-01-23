@@ -1,18 +1,19 @@
 {
   "name": "rt-hasura",
-  "version": "1.0.1",
+  "version": "1.0.7",
   "description": "Access hasura db in real-time",
-  "scripts": {
-    "start": "node server.js"
-  },
+
   "main": "handleSockets.js",
   "author": "shivam kumar dwivedi",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.17.1",
-    "express": "^4.14.0",
     "mongo-sql": "^5.0.0",
     "pg-live-select": "^1.0.3",
     "socket.io": "^2.0.4"
+  },
+  "repository" :
+  { "type" : "git"
+  , "url" : "https://github.com/shivamd20/rt-hasura"
   }
 }

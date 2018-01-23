@@ -2,54 +2,63 @@
 
 var socketIo = require('socket.io');
 var LiveQuery = require('./liveQuery');
-var fetchAction = require('node-fetch');
 var builder = require('mongo-sql');
-var request = require('request');
 
 var axios = require('axios');
-
-var clusterName;
-
 
 var liveQuery = new LiveQuery(process.argv, "first");
 
 
-var isFunction = function(obj) {
+var isFunction = function (obj) {
     return !!(obj && obj.constructor && obj.call && obj.apply);
-  };
+};
 
-async function query(options ){
+async function query(options) {
 
-  return  await axios(options);
+    return await axios(options);
 
-}
-
-function queryData(q, token)
-{
-    var options={
-        url:'https://data.'+clusterName+'.hasura-app.io/v1/query',
-        data : q,
-        method : 'post',
-        json : true,
-        headers : {
-           Authorization : token || null,
-            "Content-Type": "application/json",
-        }
-    }
-
-     return query(options);
 }
 
 
 class HandleSocket {
 
-    constructor(server , config) {
+    queryData(q, token) {
+        var options = {
+            url: 'https://data.' + this.clusterName + '.hasura-app.io/v1/query',
+            data: q,
+            method: 'post',
+            json: true,
+            headers: {
+                Authorization: token || null,
+                "Content-Type": "application/json",
+            }
+        }
 
-        if(!config) config = {};
+        return query(options);
+    }
 
-        clusterName = config.CLUSETER_NAME || process.env.CLUSETER_NAME;
+    queryAuth(q, path, token){
 
-        liveQuery = new LiveQuery(process.argv, config);
+        var options = {
+            url: 'https://auth.' + this.clusterName + '.hasura-app.io/v1'+path,
+            data: q,
+            method: 'post',
+            json: true,
+            headers: {
+                Authorization: token || null,
+                "Content-Type": "application/json",
+            }
+        }
+
+    }
+
+    constructor(server, config) {
+
+        if (!config) config = {};
+
+        this.clusterName = config.CLUSETER_NAME || process.env.CLUSETER_NAME;
+
+        liveQuery = new LiveQuery(config);
 
 
         this.io = socketIo(server);
@@ -60,73 +69,103 @@ class HandleSocket {
 
             socket.selectMap = new Map();
 
-           // socket.token='Bearer d79e6e8a76f6363a6f200969b55e6f550d3c593c60f16214';
+            socket.on('queryauth', (query,path, fn) => {
 
-            socket.on('querydata', (query, fn) => {
-
-                queryData(query,socket.token)
+                this.queryAuth(query,path, socket.token)
                     .then(response => {
 
-                        console.log(response);
+                        //  console.log(response);
 
-                       isFunction(fn)
+                        isFunction(fn)
                         fn({
                             "status": 'ok',
                             'data': response.data
                         });
                     })
                     .catch((err) => {
-                             isFunction(fn)
-                                fn(
-                                    {
-                                        'status': 'error',
-                                        'error': err.response.data
-                                    });
+                        isFunction(fn)
+                        fn(
+                            {
+                                'status': 'error',
+                                'error': err.response.data
+                            });
 
-                    console.log(err);
-                        
+                        //     console.log(err);
+
                     });
 
 
             });
 
-            socket.on("settoken", (data,fn)=>{
+            socket.on('querydata', (query, fn) => {
 
-                socket.token=data;
-               isFunction(fn)
+                this.queryData(query, socket.token)
+                    .then(response => {
+
+                        //  console.log(response);
+
+                        isFunction(fn)
+                        fn({
+                            "status": 'ok',
+                            'data': response.data
+                        });
+                    })
+                    .catch((err) => {
+                        isFunction(fn)
+                        fn(
+                            {
+                                'status': 'error',
+                                'error': err.response.data
+                            });
+
+                        //     console.log(err);
+
+                    });
+
+
+            });
+
+            socket.on("settoken", (data, fn) => {
+
+                socket.token = data;
+                isFunction(fn)
                 fn({
-                    status : 'okay',
-                    message : 'auth token set'
+                    status: 'okay',
+                    message: 'auth token set'
                 });
 
             })
 
-            socket.on('subscribe', (data,key, fn) => {
+            socket.on('subscribe', (data, key, fn) => {
 
                 //   var  includediff = what.diff?true:false,
                 //     includedata = what.data?true:false;
 
-                console.log('key:  ' + key);
+                // console.log('key:  ' + key);
 
-                queryData(data, socket.token)
+                if (socket.selectMap.get(key)) {
+                    socket.selectMap.get(key).stop();
+                }
+
+                this.queryData(data, socket.token)
 
                     .then((result) => {
 
-                        console.log('permission granted')
-                         console.log( JSON.stringify(result.data));
- 
+                        //   console.log('permission granted')
+                        //   console.log( JSON.stringify(result.data));
+
                         var sql = convertToString(data);
 
                         socket.selectMap.set(key, liveQuery.select(sql.query, sql.values, (diff, data) => {
 
-                            socket.emit('datachange'+ key, data);
+                            socket.emit('datachange' + key, data);
 
-                        //    console.log("key: " + key + "  diff:  " + JSON.stringify(diff) + "  data: " + JSON.stringify(data));
+                            //    console.log("key: " + key + "  diff:  " + JSON.stringify(diff) + "  data: " + JSON.stringify(data));
                         }
                             , (e) => {
 
-                               // console.log(e);
-                              isFunction(fn)
+                                console.log(e);
+                                isFunction(fn)
                                 fn({
                                     error: e.toString(),
 
@@ -140,13 +179,13 @@ class HandleSocket {
 
                         var errstr;
 
-                        if(err.response){
-                            errstr= err.response.data
-                        }else{
+                        if (err.response) {
+                            errstr = err.response.data
+                        } else {
                             errstr = err.toString();
                         }
-                        
-                       isFunction(fn)
+
+                        isFunction(fn)
                         fn({
                             error: errstr,
 
@@ -155,42 +194,34 @@ class HandleSocket {
                         });
 
                     });
-
-
+                    
             });
 
 
-            socket.on('unsubscribe', ( key, fn) => {
-                
-                var lq=socket.selectMap.get(key);
+            socket.on('unsubscribe', (key, fn) => {
 
-                if(lq){
-                        lq.stop();
-                        lq=null;
+                var lq = socket.selectMap.get(key);
 
-                       isFunction(fn)
-                        fn(key, {
-                            status:'unsubscribed'
-                        });
+                if (lq) {
+                    lq.stop();
+                    lq = undefined;
+                    socket.selectMap.push(key, undefined);
+
+                    isFunction(fn)
+                    fn(key, {
+                        status: 'unsubscribed'
+                    });
                 }
                 else
 
-               isFunction(fn)
+                    isFunction(fn)
                 fn(key, {
-                    status:'key not subscribed'
+                    status: 'key not subscribed'
                 });
 
             });
         }
-
         this.io.on('connection', this.onConnection);
-    }
-
-
-
-    dataQuery(body, token) {
-
-
     }
 
 }
@@ -199,29 +230,29 @@ class HandleSocket {
 
 function convertToString(jsonQuery) {
 
-    if( !jsonQuery || !jsonQuery.args || !jsonQuery.args.table || !jsonQuery.args.columns ) return;
+    if (!jsonQuery || !jsonQuery.args || !jsonQuery.args.table || !jsonQuery.args.columns) return;
 
-    console.log("json query");
-    console.log(jsonQuery);
+    // console.log("json query");
+    // console.log(jsonQuery);
     var obj = {}
     if (jsonQuery.type === 'select') {
         obj.type = jsonQuery.type;
         obj.table = jsonQuery.args.table;
 
 
-        var where={
+        var where = {
 
         }
 
-        if(jsonQuery.args.where)
-        obj.where = jsonQuery.args.where;
+        if (jsonQuery.args.where)
+            obj.where = jsonQuery.args.where;
 
-        if(jsonQuery.args.order_by){
+        if (jsonQuery.args.order_by) {
 
-            obj.order =[]
+            obj.order = []
             jsonQuery.args.order_by.forEach(element => {
-                
-                obj.order.push(""+element.column+" "+ (element.order || "") );
+
+                obj.order.push("" + element.column + " " + (element.order || ""));
 
             });
         }
@@ -230,13 +261,13 @@ function convertToString(jsonQuery) {
         obj.columns = jsonQuery.args.columns;
         var sql = builder.sql(obj);
 
-        if(jsonQuery.args.limit){
-            sql.query= sql.query+" limit "+jsonQuery.args.limit;
+        if (jsonQuery.args.limit) {
+            sql.query = sql.query + " limit " + jsonQuery.args.limit;
         }
     }
     else return;
-    console.log("sql: ");
-    console.log(sql.values);
+    // console.log("sql: ");
+    // console.log(sql.values);
 
 
     return sql;
@@ -245,31 +276,4 @@ function convertToString(jsonQuery) {
 
 module.exports = HandleSocket;
 
-console.log(convertToString(
-    {
-        "type": "select",
-        "args": {
-            "table": "article",
-            "columns": [
-                "author_id",
-                "content"
-            ],
-            "where": {
-                "$eq": {
-                    '$author_id':'ramu'
-                }
-            }
-        }
-    }
-));
 
-// queryData(JSON.stringify({
-//     "type": "select",
-//     "args": {
-//         "table": "article",
-//         "columns": [
-//             "*"
-//         ]
-//     }
-// })
-// ,'Bearer d79e6e8a76f6363a6f200969b55e6f550d3c593c60f16214');

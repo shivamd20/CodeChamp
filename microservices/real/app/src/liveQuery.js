@@ -30,10 +30,8 @@ class LiveQuery{
             +'@'+this.dbcred.hostname+':'+this.dbcred.port+'/'+this.dbcred.dbname+'?searchpath=public';
     }
 
-    constructor(config,value){
+    constructor(config){
 
-
-       
             this.dbcred={
               username:config.POSTGRES_USERNAME || process.env.POSTGRES_USERNAME  ,
               password:config.POSTGRES_PASSWORD || process.env.POSTGRES_PASSWORD ,
@@ -43,8 +41,8 @@ class LiveQuery{
             }
           
 
-            console.log(this.getConnectionString());
-            this.liveDb=new LivePg(this.getConnectionString(), value||"ramu");
+       //     console.log(this.getConnectionString());
+            this.liveDb=new LivePg(this.getConnectionString(), "ramu");
 
             process.on('SIGINT', ()=> {
                 this.liveDb.cleanup(process.exit);

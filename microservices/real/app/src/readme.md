@@ -1,0 +1,1 @@
+Access hasura db in real-time

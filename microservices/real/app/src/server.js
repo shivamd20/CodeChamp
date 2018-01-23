@@ -29,7 +29,7 @@ app.get('/', function (req, res) {
 
 app.use(express.static('client'))
 
-var handleSocket=new HandleSocket(server);
+//var handleSocket=new HandleSocket(server);
 
 
 
