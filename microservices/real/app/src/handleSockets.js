@@ -94,8 +94,9 @@ class HandleSocket {
 
                     });
 
+                    if(isFunction(onCn))
                     onCn(socket);
-
+                  
             });
 
             socket.on('querydata', (query, fn) => {
