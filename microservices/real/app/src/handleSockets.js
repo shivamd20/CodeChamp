@@ -52,7 +52,7 @@ class HandleSocket {
 
     }
 
-    constructor(server, config) {
+    constructor(server, config, onCn) {
 
         if (!config) config = {};
 
@@ -94,6 +94,7 @@ class HandleSocket {
 
                     });
 
+                    onCn(socket);
 
             });
 

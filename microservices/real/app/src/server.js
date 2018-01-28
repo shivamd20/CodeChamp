@@ -34,7 +34,7 @@ app.use(express.static('client'))
 
 
 
-server.listen(8080, function () {
+server.listen(process.env.port || 8080, function () {
     console.log('Example app listening on port 8080!');
   });
 
