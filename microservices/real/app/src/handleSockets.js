@@ -50,7 +50,11 @@ class HandleSocket {
             }
         }
 
+        return query(options);
+
     }
+
+ 
 
     constructor(server, config, onCn) {
 
@@ -68,6 +72,28 @@ class HandleSocket {
         this.onConnection = (socket) => {
 
             socket.selectMap = new Map();
+
+            socket.on('proxyrq', (options, fn)=>{
+
+                    query(options).then((response)=>{
+                        isFunction(fn)
+                        fn({
+                            "status": 'ok',
+                            'data': response.data
+                        });
+                    }).catch((err) => {
+                        isFunction(fn)
+                        fn(
+                            {
+                                'status': 'error',
+                                'error': err.response.data
+                            });
+
+                        //     console.log(err);
+
+                    });
+
+            });
 
             socket.on('queryauth', (query,path, fn) => {
 
