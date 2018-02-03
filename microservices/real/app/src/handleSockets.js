@@ -54,7 +54,7 @@ class HandleSocket {
 
     }
     
-    onConnection = (socket) => {
+    onConnection (socket){
 
         socket.selectMap = new Map();
 
