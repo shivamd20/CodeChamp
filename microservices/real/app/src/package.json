@@ -1,6 +1,6 @@
 {
   "name": "rt-hasura",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Access hasura db in real-time",
 
   "main": "handleSockets.js",
