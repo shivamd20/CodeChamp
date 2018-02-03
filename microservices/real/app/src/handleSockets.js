@@ -262,7 +262,7 @@ class HandleSocket {
 
         this.io = socketIo(server);
 
-        //this.io.set('origins', '*');
+        this.io.set('origins', '*');
 
       
         this.io.on('connection', this.onConnection);
