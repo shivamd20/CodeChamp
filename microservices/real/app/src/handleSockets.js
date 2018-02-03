@@ -61,7 +61,7 @@ class HandleSocket {
         socket.on('proxyrq', (options, fn)=>{
 
                 query(options).then((response)=>{
-                    isFunction(fn)
+                    if(isFunction(fn))
                     fn({
                         "status": 'ok',
                         'data': response.data,
@@ -70,7 +70,7 @@ class HandleSocket {
                         statusText : response.statusText
                     });
                 }).catch((err) => {
-                    isFunction(fn)
+                    if(isFunction(fn))
                     fn(
                         {
                             'status': 'error',
@@ -93,14 +93,14 @@ class HandleSocket {
 
                     //  console.log(response);
 
-                    isFunction(fn)
+                    if(isFunction(fn))
                     fn({
                         "status": 'ok',
                         'data': response.data
                     });
                 })
                 .catch((err) => {
-                    isFunction(fn)
+                    if(isFunction(fn))
                     fn(
                         {
                             'status': 'error',
@@ -121,7 +121,7 @@ class HandleSocket {
 
                     //  console.log(response);
 
-                    isFunction(fn)
+                    if(isFunction(fn))
                     fn({
                         "status": 'ok',
                         'data': response.data,
@@ -131,7 +131,7 @@ class HandleSocket {
                     });
                 })
                 .catch((err) => {
-                    isFunction(fn)
+                    if(isFunction(fn))
                     fn(
                         {
                             'status': 'error',
@@ -151,7 +151,7 @@ class HandleSocket {
         socket.on("settoken", (data, fn) => {
 
             socket.token = data;
-            isFunction(fn)
+          if(  isFunction(fn))
             fn({
                 status: 'okay',
                 message: 'auth token set'
@@ -188,7 +188,7 @@ class HandleSocket {
                         , (e) => {
 
                             console.log(e);
-                            isFunction(fn)
+                            if(isFunction(fn))
                             fn({
                                 error: e.toString(),
 
@@ -208,7 +208,7 @@ class HandleSocket {
                         errstr = err.toString();
                     }
 
-                    isFunction(fn)
+                    if(isFunction(fn))
                     fn({
                         error: errstr,
 
@@ -230,14 +230,14 @@ class HandleSocket {
                 lq = undefined;
                 socket.selectMap.push(key, undefined);
 
-                isFunction(fn)
+                if(isFunction(fn))
                 fn(key, {
                     status: 'unsubscribed'
                 });
             }
             else
 
-                isFunction(fn)
+            if(isFunction(fn))
             fn(key, {
                 status: 'key not subscribed'
             });
